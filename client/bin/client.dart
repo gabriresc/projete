@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 void main() async {
 
   // Exemplo POST → envia dados para /process do Flask
-  File file = File('C:/Users/gabri/Downloads/projete/client/bin/img2.jpeg');
+  File file = File('C:/Users/gabri/Downloads/projete/client/bin/img3.jpeg');
   List<int> imageBytes = await file.readAsBytes();
   String base64Image = base64Encode(imageBytes);
 
