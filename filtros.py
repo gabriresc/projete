@@ -36,31 +36,35 @@ def process():
     #Com IA
     img_rgb = cv2.cvtColor(blur, cv2.COLOR_BGR2RGB)
     results = model(img_rgb, iou=0.45)
-    tamanho = 0
-    min_y1 = float('inf')  # valor bem alto para começar
+ # valor bem alto para começar
     box_ref = None
-    num = 1
+    boxes_all = []
+
     for r in results:
         boxes = r.boxes.xyxy.cpu().numpy()   # coordenadas [x1, y1, x2, y2]
         confs = r.boxes.conf.cpu().numpy()   # confiança
-        classes = r.boxes.cls.cpu().numpy()  # classes preditas
-            
-        for box, conf, cls in zip(boxes, confs, classes):
+        classes = r.boxes.cls.cpu().numpy()
+          # classes preditasaa
+        min_y1 = float('inf')
+        tamanho = 0
+        for box in boxes:
             x1, y1, x2, y2 = map(int, box)
         
             if y1 < min_y1:
                 min_y1 = y1
                 tamanho = y2 - y1
                 box_ref = (x1, y1, x2, y2)
-            
+        num = 1 
         for box, conf, cls in zip(boxes, confs, classes):
             x1, y1, x2, y2 = map(int, box)
             w = y2 - y1
+            verificador = False
             if(tamanho>w):
+                verificador = True
                 # Desenha retângulo
                 cv2.rectangle(img_rgb, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
-                # Escreve classe + confiança
+                # Escreve  classe + confiança
                 label = f"{'Correto'} {conf:.2f} {num}"
                 cv2.putText(img_rgb, label, (x1, y1 - 10),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
@@ -72,12 +76,19 @@ def process():
                 label = f"{'Incorreto'} {conf:.2f} {num}"
                 cv2.putText(img_rgb, label, (x1, y1 - 10),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+            boxes_all.append({
+                'box': (x1, y1, x2, y2),
+                'veri':verificador
+            })
             num += 1
+    
     if box_ref:
         x1, y1, x2, y2 = box_ref
         cv2.rectangle(img_rgb, (x1, y1), (x2, y2), (255, 255, 0), 2)
         cv2.putText(img_rgb, "Referencia", (x1, y1 - 30),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 0), 2)
+    for box in boxes_all:
+        print(box)  
     cv2.imshow("Deteccao", img_rgb)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
