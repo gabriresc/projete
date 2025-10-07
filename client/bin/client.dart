@@ -28,7 +28,7 @@ class Box {
 void main() async {
 
   // Exemplo POST → envia dados para /process do Flask
-  File file = File('C:/Users/gabri/Downloads/projete/client/bin/img3.jpeg');
+  File file = File('C:/Users/gabri/Downloads/projete/client/bin/A.jpeg');
   List<int> imageBytes = await file.readAsBytes();
   String base64Image = base64Encode(imageBytes);
 

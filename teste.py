@@ -30,7 +30,7 @@ def process():
         return jsonify(error="Imagem inválida ou corrompida"), 400
     model = YOLO("Gray_Blur.pt")
     # Processamento exemplo: escala de cinza
-    imagem = cv2.resize(img, (800, 800))
+    imagem = cv2.resize(img, (600, 600))
 
     # Remove tons de azul com HSV
     hsv = cv2.cvtColor(imagem, cv2.COLOR_BGR2HSV)
@@ -55,7 +55,7 @@ def process():
 
     #Com IA
     img_rgb = cv2.cvtColor(blur, cv2.COLOR_BGR2RGB)
-    results = model(img_rgb, iou=0.45)
+    results = model(img_rgb)
 
  # valor bem alto para começar
     box_ref = None
@@ -85,14 +85,15 @@ def process():
                 cv2.rectangle(img_rgb, (x1, y1), (x2, y2), (255, 255, 0), 2)
                 cv2.putText(img_rgb, "Referencia", (x1, y1 - 30),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 0), 2)
+                continue
 
-            elif(tamanho>w):
+            if(tamanho>w):
                 verificador = 1
                 # Desenha retângulo
                 cv2.rectangle(img_rgb, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
                 # Escreve  classe + confiança
-                label = f"{'Correto'}"
+                label = f"{'Seguro'}"
                 cv2.putText(img_rgb, label, (x1, y1 - 10),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
             else:
@@ -100,7 +101,7 @@ def process():
                 cv2.rectangle(img_rgb, (x1, y1), (x2, y2), (0, 0, 255), 2)
 
                 # Escreve classe + confiança
-                label = f"{'Incorreto'}"
+                label = f"{'Alergico'}"
                 cv2.putText(img_rgb, label, (x1, y1 - 10),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
             boxes_all.append({
